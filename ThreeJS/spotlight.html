@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>我的第一个WebGL程序</title>
+
+    <style>body { margin: 0; overflow: hidden; }; canvas { width: 100%;  height: 100%; }</style>
+
+</head>
+
+<body>
+
+    <script src="js/three.js"></script>
+
+    <script>
+
+        //创建场景
+
+        var scene = new THREE.Scene();
+
+        //创建摄影机
+
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+
+        camera.position.set(300, 300, 300);
+
+        //创建绿色立方体
+
+        var box = new THREE.Mesh(
+
+            new THREE.CubeGeometry(5, 5, 40),
+
+            new THREE.MeshLambertMaterial({
+
+                color: 0x00ff00
+
+            }));
+
+        box.position.set(0, 15, 0);
+
+        box.castShadow = true;
+
+        scene.add(box);
+
+        //创建红色地面
+
+        var ground = new THREE.Mesh(
+
+            new THREE.CubeGeometry(200, 1, 200),
+
+            new THREE.MeshLambertMaterial({
+
+                color: 0xff0000,
+
+            }));
+
+        ground.receiveShadow = true;
+
+        scene.add(ground);
+
+        //创建渲染器并把设置背景为蓝色
+
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        renderer.setClearColor(0x0000ff);
+
+        renderer.shadowMapEnabled = true;
+
+        document.body.appendChild(renderer.domElement);
+
+        //添加聚光灯
+
+        var light = new THREE.SpotLight( 0xffffff, 3 );
+
+        light.position.set( 100, 200, 50 );
+
+        light.castShadow = true;        
+
+        light.shadowCameraNear = 50;
+
+        light.shadowCameraFar = 300;
+
+        light.shadowCameraFov = 30;
+
+        
+
+        scene.add( light );
+
+        //渲染画面
+
+        var render = function() {
+
+            requestAnimationFrame(render);
+
+            
+
+            //box.rotation.y += 0.01;
+
+            //ground.rotation.y += 0.01;
+
+            
+
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+
+        };
+
+        render();
+
+    </script>
+
+</body>
+
+</html>

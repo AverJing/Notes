@@ -26,7 +26,7 @@
     - 在球体外蒙版值为0，在球体内蒙版值为1
     - **此处利用这个特性，作为透明度**
     
-  - 和PaticleColor中的透明度相乘，注意alpha的值：0.0代表完全透明，1.0代表不透明。
+  - 和PaticleColor中的透明度相乘，注意alpha的值：**0.0代表完全透明，1.0代表不透明**。
 
   - 上一步得到的值在和Noise（[文档](http://api.unrealengine.com/CHN/Engine/Rendering/Materials/ExpressionReference/Utility/index.html#noise)）中得到的值相乘
 
@@ -181,6 +181,29 @@
   - Initial Velocity，速度设置在-250到250之间
   - const Acceleration，设置z为-900，使粒子向下边运动。
   - 设置Drag属性。
+- 二次爆炸效果
+  - 在event Generator，类型设置为Death（当发射器中的粒子死亡时，触发事件），自定义事件的名称Death
+  - 在EventReceiver Spawn监听自定义事件Death，根据所出发的事件来生成新的粒子。
+
+#### 烟花的发射
+- 蓝图Launcher
+  - 涉及到的蓝图基本语句如下，不等；与；分支；设置某个变量的值；**自定义事件**；**clear Timer by Function Name**；**Set Timer by Function Name**；**Spawn Actor for Gameplay task**（用来生成新的actor，可以用一个蓝图控制其他蓝图产生actor）；序列（执行一系列的引脚）；**Spawn Actor Skeletal Mesh Actor**
+  - **LaunchShell**事件，用来设置蓝图Shell的属性，使用**Spawn Actor for Gameplay task**来产生actor
+- **蓝图Shell**
+  - 看下边**如何使用C++代码设置粒子系统**，此处用到了这两种激活粒子发射器的方法：1.使用particle system component的set template函数，在该蓝图中用来发射烟花的尾巴 2. 或者直接使用SpawnEmitterAtLocation函数，在该蓝图中用来实现爆炸效果
+  - 在Construction Script中，
+    - 调用set template，
+    - 并设置一些颜色啊，是否开启烟雾等属性；
+    - 注意为了使粒子系统移动和旋转，此蓝图额外加了**Projectile Movement Component**（设置InitialSpeed）和**Rotating Movement Component**（设置Rotation Rate）组件
+    - 设置Particle life和Burst life
+  - BeginPlay
+    - 根据Particle life设置计时器调用Stop Particle（调用Set Active，让particle system component失效）事件
+  - Explode事件
+    - **Exlode Shaped Burst**
+      - 粒子系统中允许粒子从骨骼网格体的顶点或多边形表面发射。[Skel Vert/Surf Loc 参考](http://api.unrealengine.com/CHN/Engine/Rendering/ParticleSystems/Reference/Modules/Location/index.html#skeletalmeshvertex/surfacelocation_skelvert/surfloc_)
+      - 使用**Spawn Actor Skeletal Mesh Actor**生成Shape Actor并设置骨骼网格；用shape actor设置粒子发射器中Skel Vert/Surf Loc的SkeletonMeshActorParamName，其他类似。
+      - 使用时间轴来Scale ShapeActor。
+    - Explode Standard Burst
 
 #### 字体特效尝试 [教程](https://www.youtube.com/watch?v=akzW2htA1Hs)
 

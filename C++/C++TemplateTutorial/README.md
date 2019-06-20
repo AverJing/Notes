@@ -622,3 +622,67 @@ template <typename T> class ClassA
 
 
 
+#### 4 空明流转的知乎专栏-template
+
+-------------------
+
+##### 4.1 C++ Template的选择特化
+
+- ##### 根据不同的条件来选择不同的模板
+
+  - ```cpp
+    template <typename T, typename U> class Add
+    {
+        // 干点啥
+    };
+    ```
+
+  - 根据T和U是否由继承关系，来选择不同的实现
+
+    - 1. 用特化来做
+
+         ```cpp
+   template <typename T, typename U, bool Enabled = std::is_base_of<T, U>::value> class Add;  // 模板的泛化形式（原型）
+         
+         template <typename T, typename U>
+         struct Add<T, U, true>
+         {
+            // Blah blah blah
+         };
+         
+         template <typename T, typename U>
+         struct Add<T, U, false>
+         {
+            // Blah blah blah
+         };
+         ```
+      
+      2. 利用继承来做
+      
+       ```cpp
+         template <typename T, typename U>
+         struct Add: public AddBase< std::is_base_of<T, U>::value >
+         {
+            // Blah blah blah
+         };
+       ```
+      
+      3. ```cpp
+         template <typename T, typename U, typename BoolType = std::true_type> class Add;
+         
+         template <typename T, typename U>
+         struct Add<T, U, std::integral_constant<bool, std::is_base_of<T, U>::value>>
+         {
+         };
+         
+         template <typename T, typename U>
+         struct Add<T, U, std::integral_constant<bool, !std::is_base_of<T, U>::value> >
+         {
+         };
+         
+         Add<B, D> a;      // ??
+         Add<int, float> b;    // ??
+         ```
+    
+  - 
+
